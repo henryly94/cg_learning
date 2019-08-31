@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/render.dir/src/render.cc.o CMakeFiles/render.dir/external/glad/src/glad.c.o  -o render -lGL -lGLU external/glfw-3.3/src/libglfw3.a -lrt -lm -ldl -lX11 -lpthread 
