@@ -3,6 +3,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <glog/logging.h>
+
+const int FLAG_window_height = 800;
+const int FLAG_window_width = 600;
+
 const float vertices[] = {
   0.5f, 0.5f, 0.0f,   // 右上角
   0.5f, -0.5f, 0.0f,  // 右下角
@@ -47,7 +52,7 @@ unsigned int GetShaderProgram(const char* vertexShaderSource, const char* fragme
 
     if(!success) {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        LOG(FATAL) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog;
     }
 
     unsigned int fragmentShader;
@@ -59,7 +64,7 @@ unsigned int GetShaderProgram(const char* vertexShaderSource, const char* fragme
 
     if(!success) {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        LOG(FATAL) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog;
     }
     unsigned int shaderProgram;
     shaderProgram = glCreateProgram();
@@ -70,7 +75,7 @@ unsigned int GetShaderProgram(const char* vertexShaderSource, const char* fragme
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if(!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "Shader program error: " << infoLog << std::endl;
+        LOG(FATAL) << "Shader program error: " << infoLog;
     }
 
     glUseProgram(shaderProgram);
@@ -78,9 +83,6 @@ unsigned int GetShaderProgram(const char* vertexShaderSource, const char* fragme
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     return shaderProgram;
-}
-
-unsigned int GetVBO(const float[] vertices) {
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -93,31 +95,36 @@ void processInput(GLFWwindow* window) {
     }
 }
 
-void render() {
-
+void renderBackground() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-int main(){
+void Init() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+}
+
+int main(int argc, char** argv){
+    
+    LOG(INFO) << "Initializing GLFW";
+    Init();
+
+    LOG(INFO) << "Creating GLFW window with height:" << FLAG_window_height << " , width: " << FLAG_window_width;
+    GLFWwindow* window = glfwCreateWindow(FLAG_window_height, FLAG_window_width, "LearnOpenGL", NULL, NULL);
     if (window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
-        return -1;
+        LOG(FATAL) << "Failed to create GLFW window";
     }
 
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        LOG(FATAL) << "Failed to initialize GLAD";
     }
 
     
@@ -155,8 +162,7 @@ int main(){
 
         processInput(window);
 
-
-        render();
+        renderBackground();
 
         // draw our first triangle
         glUseProgram(orangeShaderProgram);

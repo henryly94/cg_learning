@@ -12,6 +12,7 @@ add_subdirectory (external)
 include_directories(
     external/glfw-3.3/include/
     external/glad/include/
+    external/glog/src/glog/
 )
 
 set(GLAD_SOURCE
@@ -21,6 +22,7 @@ set(GLAD_SOURCE
 set(ALL_LIBS
     ${OPENGL_LIBRARY}
     glfw
+    glog::glog
 )
 
 add_definitions(
