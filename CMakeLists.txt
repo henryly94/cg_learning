@@ -13,6 +13,7 @@ include_directories(
     external/glfw-3.3/include/
     external/glad/include/
     external/glog/src/glog/
+    external/gflags/include/
 )
 
 set(GLAD_SOURCE
@@ -23,6 +24,7 @@ set(ALL_LIBS
     ${OPENGL_LIBRARY}
     glfw
     glog::glog
+    gflags::gflags
 )
 
 add_definitions(

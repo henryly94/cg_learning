@@ -4,9 +4,10 @@
 #include <GLFW/glfw3.h>
 
 #include <glog/logging.h>
+#include <gflags/gflags.h>
 
-const int FLAG_window_height = 800;
-const int FLAG_window_width = 600;
+DEFINE_int32(window_height, 800, "Initial window height.");
+DEFINE_int32(window_width, 600, "Initial window width");
 
 const float vertices[] = {
   0.5f, 0.5f, 0.0f,   // 右上角
@@ -100,7 +101,8 @@ void renderBackground() {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Init() {
+void Init(int argc, char** argv) {
+    gflags::ParseCommandLineFlags(&argc, &argv, true);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -109,12 +111,12 @@ void Init() {
 }
 
 int main(int argc, char** argv){
-    
-    LOG(INFO) << "Initializing GLFW";
-    Init();
+    LOG(INFO) << "Initializing";
 
-    LOG(INFO) << "Creating GLFW window with height:" << FLAG_window_height << " , width: " << FLAG_window_width;
-    GLFWwindow* window = glfwCreateWindow(FLAG_window_height, FLAG_window_width, "LearnOpenGL", NULL, NULL);
+    Init(argc, argv);
+    
+    LOG(INFO) << "Creating GLFW window with height:" << FLAGS_window_height << " , width: " << FLAGS_window_width;
+    GLFWwindow* window = glfwCreateWindow(FLAGS_window_width, FLAGS_window_height, "LearnOpenGL", NULL, NULL);
     if (window == NULL) {
         glfwTerminate();
         LOG(FATAL) << "Failed to create GLFW window";
@@ -126,7 +128,6 @@ int main(int argc, char** argv){
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         LOG(FATAL) << "Failed to initialize GLAD";
     }
-
     
     unsigned int orangeShaderProgram = GetShaderProgram(vertexShaderSource, orangeFragmentShaderSource);
     unsigned int yellowShaderProgram = GetShaderProgram(vertexShaderSource, yellowFragmentShaderSource);
@@ -155,9 +156,6 @@ int main(int argc, char** argv){
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
 
-
-
-
     while(!glfwWindowShouldClose(window)) {
 
         processInput(window);
@@ -178,7 +176,6 @@ int main(int argc, char** argv){
         glfwPollEvents();    
     }
      // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 
