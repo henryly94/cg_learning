@@ -5,6 +5,8 @@ project (CGLearning)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(BUILD_TESTING OFF)
+
 find_package(OpenGL REQUIRED)
 
 add_subdirectory (external)
@@ -14,10 +16,12 @@ include_directories(
     external/glad/include/
     external/glog/src/glog/
     external/gflags/include/
+    external/stb_image/
 )
 
-set(GLAD_SOURCE
+set(EXTERNAL_SOURCE
     external/glad/src/glad.c
+    external/stb_image/stb_image.cc
 )
 
 set(ALL_LIBS
@@ -25,6 +29,7 @@ set(ALL_LIBS
     glfw
     glog::glog
     gflags::gflags
+    absl::strings
 )
 
 add_definitions(
@@ -32,11 +37,11 @@ add_definitions(
     -DTW_NO_LIB_PRAGMA
 )
 
-
 add_executable(
     render
     src/render.cc
-    ${GLAD_SOURCE}
+    src/shader.cc
+    ${EXTERNAL_SOURCE}
 )
 
 target_link_libraries(
