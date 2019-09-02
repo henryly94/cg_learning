@@ -6,3 +6,6 @@
   path = external/gflags
   url = git@github.com:gflags/gflags.git
 
+[submodule "abseil-cpp"]
+  path = external/abseil-cpp
+  url = git@github.com:abseil/abseil-cpp.git
