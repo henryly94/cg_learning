@@ -1,6 +1,7 @@
 # CG Learning
 
 Learning Computer Graphics through coding.
+
 [new tutorial url](https://learnopengl-cn.github.io)
 
 [tutorial
