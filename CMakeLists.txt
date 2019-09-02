@@ -17,6 +17,7 @@ include_directories(
     external/glog/src/glog/
     external/gflags/include/
     external/stb_image/
+    external/glm/
 )
 
 set(EXTERNAL_SOURCE

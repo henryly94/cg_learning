@@ -1,23 +1,29 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <glog/logging.h>
 #include <gflags/gflags.h>
 #include <stb_image.h>
 #include <absl/strings/str_cat.h>
+#include <absl/strings/str_split.h>
 #include "shader.h"
 
-DEFINE_int32(window_height, 800, "Initial window height.");
+DEFINE_int32(window_height, 600, "Initial window height.");
 DEFINE_int32(window_width, 600, "Initial window width");
 DEFINE_string(root_path, "../", "The path for project root.");
-DEFINE_string(img_path, "resource/wood.jpg", "The path for img.");
+DEFINE_string(img_path, "resource/", "The path for img.");
 DEFINE_string(shader_directory, "src/", "The path for shader files.");
 
 using cg_learning::Shader;
 using absl::StrCat;
+using absl::StrSplit;
 
 const float vertices[] = {
   0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // 右上角
@@ -31,78 +37,35 @@ const unsigned int indices[] = { // 注意索引从0开始!
   1, 2, 3  // 第二个三角形
 };
 
-const char* vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-const char* orangeFragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
-
-const char* yellowFragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.7f, 0.15f, 1.0f);\n"
-    "}\n\0";
-
-const char* uniformFragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "uniform vec4 outColor;\n"
-    "void main()\n"
-    "{\n"
-    "    FragColor = outColor;\n"
-    "}\n\0";
-
-unsigned int GetShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource) {
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader); 
-
-    int  success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-    if(!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        LOG(FATAL) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog;
+unsigned int GetTextureFromFile(const std::string& file_name){
+    unsigned int texture;
+    glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		// 为当前绑定的纹理对象设置环绕、过滤方式
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				
+		int width, height, nrChannels;
+    std::string img_file_path = StrCat(FLAGS_root_path, FLAGS_img_path, file_name);
+    stbi_set_flip_vertically_on_load(true);
+		unsigned char *data = stbi_load(img_file_path.c_str(), &width, &height, &nrChannels, 0);
+		if (!data) {
+			LOG(FATAL) << "Failed when loading image from " << FLAGS_img_path; 
+		}
+    std::vector<std::string> tmp = StrSplit(file_name, '.'); 
+    std::string& suffix = tmp.back();
+    if (suffix == "jpg") {
+		  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    } else if (suffix == "png") {
+		  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    } else {
+      LOG(FATAL) << "Image file with suffix: ." << suffix << " is not supported yet.";
     }
-
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-
-    if(!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        LOG(FATAL) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog;
-    }
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        LOG(FATAL) << "Shader program error: " << infoLog;
-    }
-
-    glUseProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    return shaderProgram;
+    glGenerateMipmap(GL_TEXTURE_2D);
+		stbi_image_free(data);
+    return texture;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -148,31 +111,21 @@ int main(int argc, char** argv){
         LOG(FATAL) << "Failed to initialize GLAD";
     }
 
-    unsigned int texture;
-    glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		// 为当前绑定的纹理对象设置环绕、过滤方式
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				
-		int width, height, nrChannels;
-		unsigned char *data = stbi_load(StrCat(FLAGS_root_path, FLAGS_img_path).c_str(), &width, &height, &nrChannels, 0);
-		if (!data) {
-			LOG(FATAL) << "Failed when loading image from " << FLAGS_img_path; 
-		}
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
-
-    unsigned int orangeShaderProgram = GetShaderProgram(vertexShaderSource, orangeFragmentShaderSource);
-    unsigned int yellowShaderProgram = GetShaderProgram(vertexShaderSource, yellowFragmentShaderSource);
-    unsigned int uniformShaderProgram = GetShaderProgram(vertexShaderSource, uniformFragmentShaderSource);
-    
+    unsigned int box_texture = GetTextureFromFile("wood.jpg");
+    unsigned int face_texture = GetTextureFromFile("awesomeface.png");
     Shader uniformShader(StrCat(FLAGS_root_path, FLAGS_shader_directory, "simple.vs"), StrCat(FLAGS_root_path, FLAGS_shader_directory, "uniform.fs"));
     Shader position2ColorShader(StrCat(FLAGS_root_path, FLAGS_shader_directory, "position.vs"), StrCat(FLAGS_root_path, FLAGS_shader_directory, "simple.fs"));
     Shader textureShader(StrCat(FLAGS_root_path, FLAGS_shader_directory, "simple_texture.vs"), StrCat(FLAGS_root_path, FLAGS_shader_directory, "simple_texture.fs"));
+    Shader doubleTextureShader(StrCat(FLAGS_root_path, FLAGS_shader_directory, "simple_texture.vs"), StrCat(FLAGS_root_path, FLAGS_shader_directory, "double_texture.fs"));
+  
+    doubleTextureShader.use();
+    glUniform1i(glGetUniformLocation(doubleTextureShader.id, "texture1"), 0);
+    glUniform1i(glGetUniformLocation(doubleTextureShader.id, "texture2"), 1);
+    glm::mat4 trans;
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+    unsigned int transformLoc = glGetUniformLocation(doubleTextureShader.id, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -210,21 +163,22 @@ int main(int argc, char** argv){
 
         renderBackground();
 
+        // Process transform
+        glm::mat4 trans;
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        unsigned int transformLoc = glGetUniformLocation(doubleTextureShader.id, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, box_texture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, face_texture);
+
         // draw our first triangle
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        position2ColorShader.use();
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-        /*
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-        uniformShader.use();
-        uniformShader.setUniform4f("outColor", {0, greenValue, 0, 1.0f});
-        */
-        textureShader.use();
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3*sizeof(unsigned int)));
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-        // glBindVertexArray(0); // no need to unbind it every time
-
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        
         glfwSwapBuffers(window);
         glfwPollEvents();    
     }
