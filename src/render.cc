@@ -20,7 +20,7 @@ DEFINE_int32(window_height, 600, "Initial window height.");
 DEFINE_int32(window_width, 600, "Initial window width");
 DEFINE_string(root_path, "../", "The path for project root.");
 DEFINE_string(img_path, "resource/", "The path for img.");
-DEFINE_string(shader_directory, "src/", "The path for shader files.");
+DEFINE_string(shader_directory, "src/shaders/", "The path for shader files.");
 
 using cg_learning::Camera;
 using cg_learning::Shader;
