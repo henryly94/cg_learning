@@ -92,6 +92,10 @@ void Shader::set4f(const std::string& name, std::array<float, 4> value) {
     glUniform4f(glGetUniformLocation(id, name.c_str()), value[0], value[1], value[2],value[3]);
 }
 
+void Shader::setVec3f(const std::string& name, std::array<float, 3> value) {
+    glUniform3f(glGetUniformLocation(id, name.c_str()), value[0], value[1], value[2]);
+}
+
 void Shader::setMatrix4f(const std::string& name, const GLfloat* value) {
     int modelLoc = glGetUniformLocation(id, name.c_str());
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value);

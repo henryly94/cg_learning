@@ -25,6 +25,8 @@ class Shader {
 
     void set4f(const std::string& name, std::array<float, 4> value);
 
+    void setVec3f(const std::string& name, std::array<float, 3> value);
+
     void setMatrix4f(const std::string& name, const GLfloat* value);
 };
 

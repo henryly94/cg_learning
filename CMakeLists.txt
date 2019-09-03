@@ -46,10 +46,20 @@ add_executable(
     ${EXTERNAL_SOURCE}
 )
 
+add_executable(
+    light
+    src/light.cc
+    src/shader.cc
+    src/camera.cc
+    ${EXTERNAL_SOURCE}
+)
 target_link_libraries(
     render
     ${ALL_LIBS}
 )
 
-
+target_link_libraries(
+    light
+    ${ALL_LIBS}
+)
 
