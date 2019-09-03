@@ -42,6 +42,7 @@ add_executable(
     render
     src/render.cc
     src/shader.cc
+    src/camera.cc
     ${EXTERNAL_SOURCE}
 )
 

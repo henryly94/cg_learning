@@ -81,11 +81,20 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 }
 
 void Shader::use() {
-  glUseProgram(id);
+    glUseProgram(id);
 }
 
-void Shader::setUniform4f(const std::string& name, std::array<float, 4> value) {
-  glUniform4f(glGetUniformLocation(id, name.c_str()), value[0], value[1], value[2],value[3]);
+void Shader::setInt(const std::string& name, int value) {
+    glUniform1i(glGetUniformLocation(id, name.c_str()), value);
+}
+
+void Shader::set4f(const std::string& name, std::array<float, 4> value) {
+    glUniform4f(glGetUniformLocation(id, name.c_str()), value[0], value[1], value[2],value[3]);
+}
+
+void Shader::setMatrix4f(const std::string& name, const GLfloat* value) {
+    int modelLoc = glGetUniformLocation(id, name.c_str());
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value);
 }
 
 } // namespace cg_learning

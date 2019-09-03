@@ -20,8 +20,12 @@ class Shader {
     explicit Shader(const std::string& vertexShaderSourcePath, const std::string& fragmentShaderSourcePath);
 
     void use();
-  
-    void setUniform4f(const std::string& name, std::array<float, 4> value);
+    
+    void setInt(const std::string& name, int value);
+
+    void set4f(const std::string& name, std::array<float, 4> value);
+
+    void setMatrix4f(const std::string& name, const GLfloat* value);
 };
 
 } // namespace cg_learning
