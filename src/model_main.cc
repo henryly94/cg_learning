@@ -178,7 +178,7 @@ int main(int argc, char** argv) {
         shader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)FLAGS_window_width / (float)FLAGS_window_height, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 model;
+        glm::mat4 model(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
         model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f)); // it's a bit too big for our scene, so scale it down
         glm::mat4 normal = model;
@@ -195,7 +195,7 @@ int main(int argc, char** argv) {
         lampShader.setMatrix4f("view", glm::value_ptr(view));
         lampShader.setMatrix4f("projection", glm::value_ptr(projection));
         for (int i=0; i<4; i++) {
-            model = glm::mat4();
+            model = glm::mat4(1.0f);
             model = glm::translate(model, pointLightPositions[i]);
             model = glm::scale(model, glm::vec3(0.2f));
             lampShader.setMatrix4f("model", glm::value_ptr(model));
