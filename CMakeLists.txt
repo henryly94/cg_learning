@@ -18,6 +18,8 @@ include_directories(
     external/gflags/include/
     external/stb_image/
     external/glm/
+    external/assimp-4.1.0/include/
+    build/external/assimp-4.1.0/include/
 )
 
 set(EXTERNAL_SOURCE
@@ -31,6 +33,7 @@ set(ALL_LIBS
     glog::glog
     gflags::gflags
     absl::strings
+    assimp
 )
 
 add_definitions(
@@ -46,6 +49,11 @@ add_executable(
     ${EXTERNAL_SOURCE}
 )
 
+target_link_libraries(
+    render
+    ${ALL_LIBS}
+)
+
 add_executable(
     light
     src/light.cc
@@ -53,13 +61,23 @@ add_executable(
     src/camera.cc
     ${EXTERNAL_SOURCE}
 )
-target_link_libraries(
-    render
-    ${ALL_LIBS}
-)
 
 target_link_libraries(
     light
     ${ALL_LIBS}
 )
 
+add_executable(
+    model
+    src/model_main.cc
+    src/shader.cc
+    src/camera.cc
+    src/model.cc
+    src/mesh.cc
+    ${EXTERNAL_SOURCE}
+)
+
+target_link_libraries(
+    model
+    ${ALL_LIBS}
+)
