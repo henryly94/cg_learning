@@ -291,7 +291,7 @@ int main(int argc, char** argv) {
         shader.setFloat("material.shininess", 64.0f);
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)FLAGS_window_width / (float)FLAGS_window_height, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 model;
+        glm::mat4 model(1.0f);
         glm::mat4 normal = model;
         normal = glm::inverse(normal);
         normal = glm::transpose(normal);
@@ -308,7 +308,7 @@ int main(int argc, char** argv) {
         
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         for (unsigned int i = 0; i < 10; i++) {
-            glm::mat4 model;
+            glm::mat4 model(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
@@ -325,7 +325,7 @@ int main(int argc, char** argv) {
         lampShader.setMatrix4f("view", glm::value_ptr(view));
         lampShader.setMatrix4f("projection", glm::value_ptr(projection));
         for (int i=0; i<4; i++) {
-            model = glm::mat4();
+            model = glm::mat4(1.0f);
             model = glm::translate(model, pointLightPositions[i]);
             model = glm::scale(model, glm::vec3(0.2f));
             lampShader.setMatrix4f("model", glm::value_ptr(model));

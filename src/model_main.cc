@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
         shader.use();
         // directional light
         shader.setVec3f("dirLight.direction", -0.2f, -1.0f, -0.3f);
-        shader.setVec3f("dirLight.ambient", 0.9f, 0.9f, 0.9f);
+        shader.setVec3f("dirLight.ambient", 0.05f, 0.05f, 0.05f);
         shader.setVec3f("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
         shader.setVec3f("dirLight.specular", 0.5f, 0.5f, 0.5f);
         // point light 1
