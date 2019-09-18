@@ -22,12 +22,20 @@ include_directories(
     build/external/assimp-4.1.0/include/
 )
 
+set(INTERNAL_SOURCE
+    src/shader.cc
+    src/camera.cc
+    src/model.cc
+    src/mesh.cc
+    src/util.cc
+)
+
 set(EXTERNAL_SOURCE
     external/glad/src/glad.c
     external/stb_image/stb_image.cc
 )
 
-set(ALL_LIBS
+set(EXTERNAL_LIBS
     ${OPENGL_LIBRARY}
     glfw
     glog::glog
@@ -51,33 +59,41 @@ add_executable(
 
 target_link_libraries(
     render
-    ${ALL_LIBS}
+    ${EXTERNAL_LIBS}
 )
 
 add_executable(
     light
     src/light.cc
-    src/shader.cc
-    src/camera.cc
+    ${INTERNAL_SOURCE}
     ${EXTERNAL_SOURCE}
 )
 
 target_link_libraries(
     light
-    ${ALL_LIBS}
+    ${EXTERNAL_LIBS}
 )
 
 add_executable(
     model
     src/model_main.cc
-    src/shader.cc
-    src/camera.cc
-    src/model.cc
-    src/mesh.cc
+    ${INTERNAL_SOURCE}
     ${EXTERNAL_SOURCE}
 )
 
 target_link_libraries(
     model
-    ${ALL_LIBS}
+    ${EXTERNAL_LIBS}
+)
+
+add_executable(
+    depth
+    src/depth.cc
+    ${INTERNAL_SOURCE}
+    ${EXTERNAL_SOURCE}
+)
+
+target_link_libraries(
+    depth
+    ${EXTERNAL_LIBS}
 )

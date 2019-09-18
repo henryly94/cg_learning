@@ -109,4 +109,8 @@ void Shader::setMatrix4f(const std::string& name, const GLfloat* value) {
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, value);
 }
 
+void Shader::setMatrix4f(const std::string& name, const glm::mat4& value) {
+    setMatrix4f(name, &value[0][0]);
+}
+
 } // namespace cg_learning

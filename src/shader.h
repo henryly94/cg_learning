@@ -33,6 +33,9 @@ class Shader {
     void setVec3f(const std::string& name, glm::vec3 value);
 
     void setMatrix4f(const std::string& name, const GLfloat* value);
+
+    void setMatrix4f(const std::string& name, const glm::mat4& value);
+
 };
 
 } // namespace cg_learning
